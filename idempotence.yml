@@ -1,0 +1,29 @@
+- hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: Installing HTTPD
+      package:
+           name: "httpd"
+           state: present
+
+    - name: Deploying the Web Page
+      copy:
+          content: "<h1>Enabling Idempotence</h1>"
+          dest: /var/www/html/index.html
+
+    - name: Starting the Service
+      service:
+           name: httpd
+           state: started
+
+    - name: Configuring Webserver
+      copy:
+       src: /handler/idem.conf
+       dest: /etc/httpd/conf.d/
+      notify: Restart_Service
+
+  handlers:
+  - name: Restart_Service
+    service:
+        name: httpd
+        state: restarted
